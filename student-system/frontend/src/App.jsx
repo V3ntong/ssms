@@ -1,16 +1,9 @@
 import { useState } from 'react'
+import { api } from './api'
+import DatabaseManager from './DatabaseManager'
 
 const EMPTY_FORM = { idnum: '', year_level: '1st Year', name: '', age: '', program: '' }
 const YEAR_LEVELS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year']
-
-async function api(path, options) {
-  const res = await fetch(path, options)
-  const data = await res.json().catch(() => ({}))
-  if (!res.ok) {
-    throw new Error(data.detail || 'Something went wrong.')
-  }
-  return data
-}
 
 function Landing({ onEnter }) {
   return (
@@ -30,7 +23,7 @@ function Landing({ onEnter }) {
   )
 }
 
-function Dashboard() {
+function StudentsSection() {
   const [dbMessage, setDbMessage] = useState(null)
   const [dbBusy, setDbBusy] = useState(false)
 
@@ -103,11 +96,7 @@ function Dashboard() {
   }
 
   return (
-    <div className="dashboard">
-      <header className="dashboard-header">
-        <span className="wordmark">Student Records</span>
-      </header>
-
+    <>
       <section className="panel setup-panel">
         <div className="setup-text">
           <h2>Database</h2>
@@ -233,6 +222,34 @@ function Dashboard() {
           )}
         </section>
       </div>
+    </>
+  )
+}
+
+function Dashboard() {
+  const [view, setView] = useState('students')
+
+  return (
+    <div className="dashboard">
+      <header className="dashboard-header">
+        <span className="wordmark">Student Records</span>
+        <nav className="view-tabs">
+          <button
+            className={`btn btn-ghost${view === 'students' ? ' active' : ''}`}
+            onClick={() => setView('students')}
+          >
+            Students
+          </button>
+          <button
+            className={`btn btn-ghost${view === 'databases' ? ' active' : ''}`}
+            onClick={() => setView('databases')}
+          >
+            Manage databases
+          </button>
+        </nav>
+      </header>
+
+      {view === 'students' ? <StudentsSection /> : <DatabaseManager />}
     </div>
   )
 }
